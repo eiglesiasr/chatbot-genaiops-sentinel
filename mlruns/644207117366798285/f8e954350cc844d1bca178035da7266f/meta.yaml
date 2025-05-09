@@ -1,0 +1,15 @@
+artifact_uri: file:///workspaces/chatbot-genaiops-sentinel/mlruns/644207117366798285/f8e954350cc844d1bca178035da7266f/artifacts
+end_time: 1746819472662
+entry_point_name: ''
+experiment_id: '644207117366798285'
+lifecycle_stage: active
+run_id: f8e954350cc844d1bca178035da7266f
+run_name: eval_q6
+run_uuid: f8e954350cc844d1bca178035da7266f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1746819469943
+status: 3
+tags: []
+user_id: vscode

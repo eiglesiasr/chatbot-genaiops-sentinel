@@ -1,237 +1,107 @@
-# 🤖 Chatbot GenAI - Caso de Estudio Recursos Humanos
+# 🛰️ Sentinel-1 Chatbot (basado en GenAIOps)
 
-Este proyecto demuestra cómo construir, evaluar y automatizar un chatbot de tipo RAG (Retrieval Augmented Generation) con buenas prácticas de **GenAIOps**.
-
----
-
-## 🧠 Caso de Estudio
-
-El chatbot responde preguntas sobre beneficios, políticas internas y roles de una empresa ficticia (**Contoso Electronics**), usando como base una colección de documentos PDF internos.
+Este proyecto es una adaptación del repositorio original [GenAIOps_Pycon2025](https://github.com/darkanita/GenAIOps_Pycon2025), redirigido al dominio de las misiones espaciales. Implementa un chatbot tipo RAG (Retrieval-Augmented Generation) para responder preguntas relacionadas con la misión Sentinel-1, un satélite equipado con un radar de apertura sintética (SAR).
 
 ---
 
-## 📂 Estructura del Proyecto
+## 📚 Nuevas fuentes de conocimiento
 
-```
-├── app/
-│   ├── ui_streamlit.py           ← interfaz simple del chatbot
-│   ├── main_interface.py         ← interfaz combinada con métricas
-│   ├── run_eval.py               ← evaluación automática
-│   ├── rag_pipeline.py           ← lógica de ingestión y RAG
-│   └── prompts/
-│       ├── v1_asistente_rrhh.txt
-│       └── v2_resumido_directo.txt
-├── data/pdfs/                    ← documentos fuente
-├── tests/
-│   ├── test_run_eval.py
-│   ├── eval_dataset.json         ← dataset de evaluación
-│   └── eval_dataset.csv
-├── .env.example
-├── Dockerfile
-├── .devcontainer/
-│   └── devcontainer.json
-├── .github/workflows/
-│   ├── eval.yml
-│   └── test.yml
-```
+En lugar de documentos internos empresariales, este sistema se alimenta de:
+
+- **Documento de definición del producto Sentinel-1**: Describe el sistema, especificaciones técnicas y capacidades del sensor SAR. Disponible en [Sentiwiki](https://sentiwiki.copernicus.eu/__attachments/1673968/S1-RS-MDA-52-7440%20-%20Sentinel-1%20Product%20Definition%202016%20-%202.7.pdf)
+- **Reporte del estado actual de la misión Sentinel-1**: Incluye información operativa, actualizaciones y estado de la mision para febrero de 2025. Disponible en [Sentiwiki](https://sentiwiki.copernicus.eu/__attachments/1681272/Sentinel-1-Mission_Status_Report_440.pdf?inst-v=098dc289-59b8-4d70-ad21-3a78e6b0a4b0)
+
+> Estos documentos han sido indexados con LlamaIndex para permitir la recuperación semántica contextual.
+
+## 💬 Modos de interacción: Prompts personalizados
+Se han definido cinco estilos de asistente (prompt templates) para evaluar cómo varía el comportamiento del modelo según el rol asignado:
+| **Versión**               | **Descripción**                                                          |
+| ------------------------- | -------------------------------------------------------------------- |
+| `v1_asistente_cientifico` | Asistente profesional, tono científico-formal.                       |
+| `v2_resumido_directo`     | Responde de forma breve y directa, sin rodeos.                       |
+| `v3_alucinogeno`          | No usa prompt, respuestas sin filtro.                                |
+| `v4_asistente_experto`    | Especialista en satélites y misiones espaciales, tono claro.         |
+| `v5_asistente_orgulloso`  | También experto, pero propenso a inventar si no conoce la respuesta. |
+
+
+## ✅ Evaluación automática
+
+Se ha ampliado el sistema de evaluación para incluir cinco criterios de calidad, implementados en `run_eval_criteria.py`:
+| **Criterio**  | **Descripción**                                     |
+| ------------- | ----------------------------------------------- |
+| `correctness` | ¿Es la respuesta fácticamente precisa?          |
+| `relevance`   | ¿Está relacionada directamente con la pregunta? |
+| `coherence`   | ¿Es clara y coherente?                          |
+| `toxicity`    | ¿Evita lenguaje ofensivo o problemático?        |
+| `harmfulness` | ¿Evita causar daño o inducir a errores?         |
+
+Las respuestas generadas por cada asistente son evaluadas automáticamente por un LLM evaluador siguiendo estos criterios.
+
+## 📊 Visualización de resultados
+Los resultados de la evaluación pueden consultarse de dos formas:
+
+- main_interface.py: Permite consultar la evaluación de una respuesta específica.
+
+- dashboard.py: Muestra visualizaciones comparativas entre diferentes versiones de asistente.
+
+Esto permite hacer análisis A/B de calidad y comportamiento del modelo bajo distintas condiciones.
 
 ---
 
-## 🚦 Ciclo de vida GenAIOps aplicado
+## 🚀 Demo
 
 ### 1. 🧱 Preparación del entorno
 
+Puedes clonar el repositorio y crear un entorno virtual con Conda:
 ```bash
 git clone https://github.com/darkanita/GenAIOps_Pycon2025 chatbot-genaiops
 cd chatbot-genaiops
 conda create -n chatbot-genaiops python=3.10 -y
 conda activate chatbot-genaiops
 pip install -r requirements.txt
-cp .env.example .env  # Agrega tu API KEY de OpenAI
 ```
+O bien, puedes usar CodeSpaces por medio del DevContainer de GitHub. Esto te permitirá ejecutar el proyecto sin necesidad de instalar nada en tu máquina local. De cualquier modo, copia el archivo por medio de 
+```bash
+cp .env.example .env
+```
+para cargar las variables del sistema. 
 
----
+> 💡
+> Recuerda agregar tu API KEY. Acá también puedes elegir la versión de Prompt para que el modelo use la que prefieras. Por defecto, se usa `v1_asistente_cientifico`. Además del `CHUNK_SIZE` y `CHUNK_OVERLAP` de tu preferencia
 
-### 2. 🔍 Ingesta y vectorización de documentos
+### 2. 💻 Ejecuta la app principal
 
-Procesa los PDFs y genera el índice vectorial:
+Primero procesa los PDFs y genera el índice vectorial por medio del siguiente comando:
 
 ```bash
 python -c "from app.rag_pipeline import save_vectorstore; save_vectorstore()"
 ```
-
-Esto:
-- Divide los documentos en chunks (por defecto `chunk_size=512`, `chunk_overlap=50`)
-- Genera embeddings con OpenAI
-- Guarda el índice vectorial en `vectorstore/`
-- Registra los parámetros en **MLflow**
-
-🔧 Para personalizar:
-```python
-save_vectorstore(chunk_size=1024, chunk_overlap=100)
-```
-
-♻️ Para reutilizarlo directamente:
-```python
-vectordb = load_vectorstore_from_disk()
-```
-
----
-
-### 3. 🧠 Construcción del pipeline RAG
-
-```python
-from app.rag_pipeline import build_chain
-chain = build_chain(vectordb, prompt_version="v1_asistente_rrhh")
-```
-
-- Soporta múltiples versiones de prompt
-- Usa `ConversationalRetrievalChain` con `LangChain` + `OpenAI`
-
----
-
-### 4. 💬 Interacción vía Streamlit
-
-Versión básica:
-```bash
-streamlit run app/ui_streamlit.py
-```
-
-Versión combinada con métricas:
+Después, ejecuta la app principal, donde podrás hacer preguntas al chatbot y ver las métricas de evaluación (tradicionales y semánticas):
 ```bash
 streamlit run app/main_interface.py
 ```
 
----
+### 3. 🧪 Evaluación automática de calidad
 
-### 5. 🧪 Evaluación automática de calidad
-
-Ejecuta:
+Usando `tests/eval_dataset.json` como ground truth, ejecuta la evaluación automática de calidad. Este script evalúa el rendimiento del modelo en función de los criterios definidos.
 
 ```bash
-python app/run_eval.py
+python app/run_eval.py # Evaluación tradicional de la calidad
+python app/run_eval_criteria.py # Evaluación semántica de la calidad
 ```
 
-Esto:
-- Usa `tests/eval_dataset.json` como ground truth
-- Genera respuestas usando el RAG actual
-- Evalúa con `LangChain Eval (QAEvalChain)`
-- Registra resultados en **MLflow**
+#### 📈 Visualización de resultados
 
----
-
-### 6. 📈 Visualización de resultados
-
-Dashboard completo:
+Puedes observar los resultados de la evaluación en el dashboard. Este script genera gráficos y tablas para comparar el rendimiento de diferentes versiones del asistente para las preguntas del dataset de evaluación.
 
 ```bash
 streamlit run app/dashboard.py
 ```
 
-- Tabla con todas las preguntas evaluadas
-- Gráficos de precisión por configuración (`prompt + chunk_size`)
-- Filtrado por experimento MLflow
+#### 🛠 Validación automatizada
 
----
-
-### 7. 🔁 Automatización con GitHub Actions
-
-- CI de evaluación: `.github/workflows/eval.yml`
-- Test unitarios: `.github/workflows/test.yml`
-
----
-
-### 8. 🧪 Validación automatizada
+Puedes evaluar el sistema de una forma alternativa y asegurarte que éste tenga al menos 80% de precisión con el dataset base.
 
 ```bash
 pytest tests/test_run_eval.py
 ```
-
-- Evalúa que el sistema tenga al menos 80% de precisión con el dataset base
-
----
-
-## 🔍 ¿Qué puedes hacer?
-
-- 💬 Hacer preguntas al chatbot
-- 🔁 Evaluar diferentes estrategias de chunking y prompts
-- 📊 Comparar desempeño con métricas semánticas
-- 🧪 Trazar todo en MLflow
-- 🔄 Adaptar a otros dominios (legal, salud, educación…)
-
----
-
-## ⚙️ Stack Tecnológico
-
-- **OpenAI + LangChain** – LLM + RAG
-- **FAISS** – Vectorstore
-- **Streamlit** – UI
-- **MLflow** – Registro de experimentos
-- **LangChain Eval** – Evaluación semántica
-- **GitHub Actions** – CI/CD
-- **DevContainer** – Desarrollo portable
-
----
-
-## 🎓 Desafío para estudiantes
-
-🧩 Parte 1: Personalización
-
-1. Elige un nuevo dominio
-Ejemplos: salud, educación, legal, bancario, etc.
-
-2. Reemplaza los documentos PDF
-Ubícalos en data/pdfs/.
-
-3. Modifica o crea tus prompts
-Edita los archivos en app/prompts/.
-
-4. Crea un conjunto de pruebas
-En tests/eval_dataset.json, define preguntas y respuestas esperadas para evaluar a tu chatbot.
-
-✅ Parte 2: Evaluación Automática
-
-1. Ejecuta run_eval.py para probar tu sistema actual.
-Actualmente, la evaluación está basada en QAEvalChain de LangChain, que devuelve una métrica binaria: correcto / incorrecto.
-
-🔧 Parte 3: ¡Tu reto! (👨‍🔬 nivel investigador)
-
-1. Mejora el sistema de evaluación:
-
-    * Agrega evaluación con LabeledCriteriaEvalChain usando al menos los siguientes criterios:
-
-        * "correctness" – ¿Es correcta la respuesta?
-        * "relevance" – ¿Es relevante respecto a la pregunta?
-        * "coherence" – ¿Está bien estructurada la respuesta?
-        * "toxicity" – ¿Contiene lenguaje ofensivo o riesgoso?
-        * "harmfulness" – ¿Podría causar daño la información?
-
-    * Cada criterio debe registrar:
-
-        * Una métrica en MLflow (score)
-
-    * Y opcionalmente, un razonamiento como artefacto (reasoning)
-
-    📚 Revisa la [documentación de LabeledCriteriaEvalChain](https://python.langchain.com/api_reference/langchain/evaluation/langchain.evaluation.criteria.eval_chain.LabeledCriteriaEvalChain.html) para implementarlo.
-
-📊 Parte 4: Mejora el dashboard
-
-1. Extiende dashboard.py o main_interface.py para visualizar:
-
-    * Las métricas por criterio (correctness_score, toxicity_score, etc.).
-    * Una opción para seleccionar y comparar diferentes criterios en gráficos.
-    * (Opcional) Razonamientos del modelo como texto.    
-
-🧪 Parte 5: Presenta y reflexiona
-1. Compara configuraciones distintas (chunk size, prompt) y justifica tu selección.
-    * ¿Cuál configuración genera mejores respuestas?
-    * ¿En qué fallan los modelos? ¿Fueron tóxicos o incoherentes?
-    * Usa evidencias desde MLflow y capturas del dashboard.
-
-🚀 Bonus
-
-- ¿Te animas a crear un nuevo criterio como "claridad" o "creatividad"? Puedes definirlo tú mismo y usarlo con LabeledCriteriaEvalChain.
-
----
-
-¡Listo para ser usado en clase, investigación o producción educativa! 🚀

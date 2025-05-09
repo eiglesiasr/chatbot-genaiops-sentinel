@@ -13,13 +13,13 @@ from app.rag_pipeline import load_vectorstore_from_disk, build_chain
 import matplotlib.pyplot as plt
 import numpy as np
 
-modo = st.sidebar.radio("Selecciona una vista:", ["🤖🚀 Chatbot", "📊 Metrics","📊 Metrics Criteria","📊 Metrics by Experiment"])
+modo = st.sidebar.radio("Selecciona una vista:", ["🤖🛰️ Chatbot", "📊 Traditional Metrics","📊 Semantic Metrics","📊 Metrics by Experiment"])
 
 vectordb = load_vectorstore_from_disk()
 chain = build_chain(vectordb)
 
-if modo == "🤖🚀 Chatbot":
-    st.title("🤖🚀 Satellite Assistant")
+if modo == "🤖🛰️ Chatbot":
+    st.title("🤖🛰️ Satellite Assistant")
     pregunta = st.text_input("What do you want to know? / ¿Qué deseas consultar? / 何をお知りになりたいですか？ ")
 
     if "chat_history" not in st.session_state:
@@ -36,7 +36,7 @@ if modo == "🤖🚀 Chatbot":
             st.markdown(f"**🤖 Bot:** {a}")
             st.markdown("---")
 
-elif modo == "📊 Metrics":
+elif modo == "📊 Traditional Metrics":
     st.title("📈 Evaluation Results")
 
     client = mlflow.tracking.MlflowClient()
@@ -80,7 +80,7 @@ elif modo == "📊 Metrics":
 
 
 
-elif modo == "📊 Metrics Criteria":
+elif modo == "📊 Semantic Metrics":
     st.title("📈 Evaluation Results")
 
     client = mlflow.tracking.MlflowClient()

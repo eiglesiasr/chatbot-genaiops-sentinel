@@ -36,7 +36,12 @@ for run in runs:
         "prompt_version": params.get("prompt_version"),
         "chunk_size": int(params.get("chunk_size", 0)),
         "chunk_overlap": int(params.get("chunk_overlap", 0)),
-        "lc_is_correct": metrics.get("lc_is_correct", 0)
+        "lc_is_correct": metrics.get("lc_is_correct", 0),
+        "Coherence": metrics.get("coherence_score", 0),
+        "Correctness": metrics.get("correctness_score", 0),
+        "Harmfulness": metrics.get("harmfulness_score", 0),
+        "Relevance": metrics.get("relevance_score", 0),
+        "Toxicity": metrics.get("toxicity_score", 0)
     })
 
 df = pd.DataFrame(data)
@@ -48,12 +53,23 @@ st.dataframe(df)
 # Agrupación para análisis
 grouped = df.groupby(["prompt_version", "chunk_size"]).agg(
     promedio_correcto=("lc_is_correct", "mean"),
+    promedio_Coherence=("Coherence", "mean"),
+    promedio_Correctness=("Correctness", "mean"),
+    promedio_Harmfulness=("Harmfulness", "mean"),
+    promedio_Relevance=("Relevance", "mean"),
+    promedio_Toxicity=("Toxicity", "mean"),
     preguntas=("pregunta", "count")
 ).reset_index()
 
-st.subheader("📊 Desempeño agrupado por configuración")
+st.subheader("📊 Resumen del desempeño")
 st.dataframe(grouped)
 
 # Gráfico
 grouped["config"] = grouped["prompt_version"] + " | " + grouped["chunk_size"].astype(str)
-st.bar_chart(grouped.set_index("config")["promedio_correcto"])
+st.bar_chart(grouped.set_index("config")[["promedio_correcto", 
+                                          "promedio_Coherence",
+                                          "promedio_Correctness",
+                                          "promedio_Harmfulness",
+                                          "promedio_Relevance",
+                                          "promedio_Toxicity"
+                                          ]])

@@ -1,0 +1,15 @@
+artifact_uri: file:///D:/GIT/chatbot-genaiops/mlruns/466707196543123603/d6db9fb1c8ae4e148d2d61323b2f7966/artifacts
+end_time: 1746825198165
+entry_point_name: ''
+experiment_id: '466707196543123603'
+lifecycle_stage: active
+run_id: d6db9fb1c8ae4e148d2d61323b2f7966
+run_name: vectorstore_build
+run_uuid: d6db9fb1c8ae4e148d2d61323b2f7966
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1746825198150
+status: 3
+tags: []
+user_id: vscode

@@ -1,0 +1,6 @@
+artifact_location: file:///workspaces/chatbot-genaiops-sentinel/mlruns/201918913284770158
+creation_time: 1746820025107
+experiment_id: '201918913284770158'
+last_update_time: 1746820025107
+lifecycle_stage: active
+name: eval_criteria_v1_asistente_cientifico_512
