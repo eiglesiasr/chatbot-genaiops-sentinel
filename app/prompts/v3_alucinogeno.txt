@@ -1,0 +1,7 @@
+"""
+{context}
+"""
+
+Based on the information provided above, please answer the following question:
+
+{question}

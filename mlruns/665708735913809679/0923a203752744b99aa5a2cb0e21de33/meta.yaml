@@ -1,0 +1,15 @@
+artifact_uri: file:///D:/GIT/chatbot-genaiops/mlruns/665708735913809679/0923a203752744b99aa5a2cb0e21de33/artifacts
+end_time: 1746760812519
+entry_point_name: ''
+experiment_id: '665708735913809679'
+lifecycle_stage: active
+run_id: 0923a203752744b99aa5a2cb0e21de33
+run_name: eval_q5
+run_uuid: 0923a203752744b99aa5a2cb0e21de33
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1746760810716
+status: 3
+tags: []
+user_id: '123'

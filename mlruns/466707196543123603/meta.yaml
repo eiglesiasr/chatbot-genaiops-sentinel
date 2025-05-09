@@ -1,0 +1,6 @@
+artifact_location: file:///D:/GIT/chatbot-genaiops/mlruns/466707196543123603
+creation_time: 1746758819848
+experiment_id: '466707196543123603'
+last_update_time: 1746758819848
+lifecycle_stage: active
+name: vectorstore_tracking
