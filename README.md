@@ -105,3 +105,38 @@ Puedes evaluar el sistema de una forma alternativa y asegurarte que éste tenga 
 ```bash
 pytest tests/test_run_eval.py
 ```
+# Chatbot GenAI + Ops Sentinel  
+
+## 📌 Evidencias Experimentales  
+
+### 🔍 Hallazgos Clave  
+
+#### 1. Optimización de Tamaño de Chunks  
+- **Chunk size óptimo**: **1024 tokens** (balance ideal entre contexto y eficiencia procesamiento).  
+- **Gráfica de soporte**:  
+  ![Comparativa Chunk Size](/evidencias/comparativa_experimentos_chunk_size.png)  
+
+#### 2. Efectividad de Tipos de Prompt  
+- **Prompts estructurados** (ej: con pasos o ejemplos) incrementan la precisión en **~22%** frente a prompts libres.  
+- **Gráfica de soporte**:  
+  ![Comparativa de Prompts](/evidencias/comparativa_tipo_prompt.png)  
+
+#### 3. Pipeline de Experimentos  
+- **Flujo validado**:  
+  1. **Chunking** (1024 tokens).  
+  2. **Procesamiento** con LLMs (GPT-3.5/Mistral).  
+  3. **Post-procesamiento** y evaluación.  
+- **Diagrama**:  
+  ![Pipeline Experimental](/evidencias/mlflow_experiments.png)  
+
+#### 4. Resúmenes Automáticos  
+- **Chunks de 1024 tokens** permiten generar resúmenes coherentes en respuestas largas.  
+- **Ejemplo visual**:  
+  ![Resúmenes](/evidencias/v2_resumido_criterio_1024.png)  
+
+---
+
+## 🛠️ Configuración Técnica  
+```bash
+git clone https://github.com/eiglesiasr/chatbot-genaiops-sentinel.git  
+pip install -r requirements.txt  
