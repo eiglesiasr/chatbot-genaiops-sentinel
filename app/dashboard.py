@@ -1,5 +1,4 @@
 # app/dashboard.py
-# app/dashboard.py
 import mlflow
 import pandas as pd
 import streamlit as st
@@ -46,25 +45,24 @@ for run in runs:
 
 df = pd.DataFrame(data)
 
-# --- Agregar estas líneas para depuración ---
-st.subheader("🔍 Inspección del DataFrame")
-st.dataframe(df)
-st.subheader("📊 Tipos de datos del DataFrame")
-st.write(df.dtypes)
-st.subheader("📊 Valores nulos por columna")
-st.write(df.isnull().sum())
-# --- Fin de las líneas de depuración ---
-
 # Calcular la precisión global basada en el tipo de experimento
-print(f"Nombre del experimento seleccionado: {selected_exp_name}")
-
 if "criteria" in selected_exp_name:
     numeric_criteria_metrics = df[["Coherence", "Correctness", "Harmfulness", "Relevance", "Toxicity"]]
-    # Filtrar las filas donde al menos una de las métricas criteria no sea cero
+    st.subheader("📊 DataFrame de métricas criteria:")
+    st.dataframe(numeric_criteria_metrics)
     valid_criteria_rows = numeric_criteria_metrics[(numeric_criteria_metrics != 0).any(axis=1)]
-    global_precision = valid_criteria_rows.mean(axis=1).mean() * 100 if not valid_criteria_rows.empty else 0.0
+    st.subheader("📊 DataFrame filtrado (filas no cero):")
+    st.dataframe(valid_criteria_rows)
+    mean_by_row = valid_criteria_rows.mean(axis=1)
+    st.subheader("📊 Promedio por fila:")
+    st.write(mean_by_row)
+    global_precision = mean_by_row.mean() * 100 if not mean_by_row.empty else 0.0
+    st.subheader("✅ Precisión Global Calculada (experimentos criteria):")
+    st.write(f"{global_precision:.1f}%")
 else:
     global_precision = df["lc_is_correct"].mean() * 100 if not df.empty else 0.0
+    st.subheader("✅ Precisión Global Calculada (otros experimentos):")
+    st.write(f"{global_precision:.1f}%")
 
 # Mostrar la precisión global y el número de respuestas evaluadas
 st.subheader("📊 Métricas Clave")
