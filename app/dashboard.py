@@ -19,15 +19,16 @@ exp_names = [exp.name for exp in experiments]
 selected_exp_name = st.selectbox("Selecciona un experimento para visualizar:", exp_names)
 
 experiment = client.get_experiment_by_name(selected_exp_name)
+print("--- Experiment ID seleccionado: ---")
+print(experiment.experiment_id)
 runs = client.search_runs(experiment_ids=[experiment.experiment_id], order_by=["start_time DESC"])
-
-if not runs:
-    st.warning("No hay ejecuciones registradas en este experimento.")
-    st.stop()
+print("--- Número de runs encontrados: ---")
+print(len(runs))
 
 # Convertir runs a DataFrame
 data = []
 for run in runs:
+    print("--- Procesando un run ---")
     params = run.data.params
     metrics = run.data.metrics
     row_data = {
