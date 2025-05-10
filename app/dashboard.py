@@ -46,7 +46,18 @@ for run in runs:
 
 df = pd.DataFrame(data)
 
+# --- Agregar estas líneas para depuración ---
+st.subheader("🔍 Inspección del DataFrame")
+st.dataframe(df)
+st.subheader("📊 Tipos de datos del DataFrame")
+st.write(df.dtypes)
+st.subheader("📊 Valores nulos por columna")
+st.write(df.isnull().sum())
+# --- Fin de las líneas de depuración ---
+
 # Calcular la precisión global basada en el tipo de experimento
+print(f"Nombre del experimento seleccionado: {selected_exp_name}")
+
 if "criteria" in selected_exp_name:
     numeric_criteria_metrics = df[["Coherence", "Correctness", "Harmfulness", "Relevance", "Toxicity"]]
     # Filtrar las filas donde al menos una de las métricas criteria no sea cero
