@@ -1,4 +1,5 @@
 # app/dashboard.py
+# app/dashboard.py
 import mlflow
 import pandas as pd
 import streamlit as st
@@ -45,6 +46,16 @@ for run in runs:
 
 df = pd.DataFrame(data)
 
+# Calcular la precisión global como el promedio de las métricas numéricas
+numeric_metrics = df[["lc_is_correct", "Coherence", "Correctness", "Harmfulness", "Relevance", "Toxicity"]]
+global_precision = numeric_metrics.mean(axis=1).mean() * 100 if not numeric_metrics.empty else 0.0
+
+# Mostrar la precisión global y el número de respuestas evaluadas
+st.subheader("📊 Métricas Clave")
+col1, col2 = st.columns(2)
+col1.metric("Precisión Global", f"{global_precision:.1f}%")
+col2.metric("Respuestas Evaluadas", len(df))
+
 # Mostrar tabla completa
 st.subheader("📋 Resultados individuales por pregunta")
 st.dataframe(df)
@@ -65,10 +76,10 @@ st.dataframe(grouped)
 
 # Gráfico
 grouped["config"] = grouped["prompt_version"] + " | " + grouped["chunk_size"].astype(str)
-st.bar_chart(grouped.set_index("config")[["promedio_correcto", 
-                                          "promedio_Coherence",
-                                          "promedio_Correctness",
-                                          "promedio_Harmfulness",
-                                          "promedio_Relevance",
-                                          "promedio_Toxicity"
-                                          ]])
+st.bar_chart(grouped.set_index("config")[["promedio_correcto",
+                                            "promedio_Coherence",
+                                            "promedio_Correctness",
+                                            "promedio_Harmfulness",
+                                            "promedio_Relevance",
+                                            "promedio_Toxicity"
+                                            ]])
