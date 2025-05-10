@@ -46,9 +46,12 @@ for run in runs:
 
 df = pd.DataFrame(data)
 
-# Calcular la precisión global como el promedio de las métricas numéricas
-numeric_metrics = df[["lc_is_correct", "Coherence", "Correctness", "Harmfulness", "Relevance", "Toxicity"]]
-global_precision = numeric_metrics.mean(axis=1).mean() * 100 if not numeric_metrics.empty else 0.0
+# Calcular la precisión global basada en el tipo de experimento
+if "criteria" in selected_exp_name:
+    numeric_criteria_metrics = df[["Coherence", "Correctness", "Harmfulness", "Relevance", "Toxicity"]]
+    global_precision = numeric_criteria_metrics.mean(axis=1).mean() * 100 if not numeric_criteria_metrics.empty else 0.0
+else:
+    global_precision = df["lc_is_correct"].mean() * 100 if not df.empty else 0.0
 
 # Mostrar la precisión global y el número de respuestas evaluadas
 st.subheader("📊 Métricas Clave")
