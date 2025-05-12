@@ -55,7 +55,7 @@ print(df)
 if "criteria" in selected_exp_name:
     numeric_criteria_metrics = df[["Coherence", "Correctness", "Harmfulness", "Relevance", "Toxicity"]]
     valid_criteria_rows = numeric_criteria_metrics[(numeric_criteria_metrics != 0).any(axis=1)]
-    global_precision = valid_criteria_rows.mean(axis=1).mean() * 100 if not valid_criteria_rows.empty else 0.0
+    global_precision = valid_criteria_rows.mean(axis=1).mean() * 10 if not valid_criteria_rows.empty else 0.0
 else:
     global_precision = df["lc_is_correct"].mean() * 100 if not df.empty else 0.0
 
